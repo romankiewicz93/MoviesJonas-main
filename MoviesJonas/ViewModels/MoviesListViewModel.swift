@@ -12,14 +12,15 @@ class MoviesListViewModel {
 
     func showMovies(url: URL) {
         Task {
-            do {
-                let movies = try await WebService()
-                    .getMovies(url: url)
+            if let movies = try? await WebService()
+                .getMovies(url: url) {
                 let updatedMovies = MovieStoreManager.uptadeAllMovies(movies)
                 let movieViewModels = updatedMovies.map(MovieViewModel.init)
                 self.movies.value = movieViewModels
-            } catch {
-                print(error)
+            } else {
+                let movies = MovieStoreManager.fetchLocalMovies() ?? []
+                let movieViewModels = movies.map(MovieViewModel.init)
+                self.movies.value = movieViewModels
             }
         }
     }

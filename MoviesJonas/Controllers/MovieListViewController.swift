@@ -63,8 +63,6 @@ extension MovieListViewController {
         cell.configure(movie)
         cell.buttonTapAction = {[weak self] in
             self?.toggleMovieFavState(movie: movie)
-           // viewModel.movie = movie.movie
-            //movie.movie.isFavorite = true
             self?.tableView.reloadData()
         }
         return cell
