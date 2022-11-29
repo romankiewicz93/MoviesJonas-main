@@ -15,9 +15,9 @@ class MoviesListViewModel {
             do {
                 let movies = try await WebService()
                     .getMovies(url: url)
-                    .map(MovieViewModel.init)
-
-                self.movies.value = movies
+                let updatedMovies = MovieStoreManager.uptadeAllMovies(movies)
+                let movieViewModels = updatedMovies.map(MovieViewModel.init)
+                self.movies.value = movieViewModels
             } catch {
                 print(error)
             }
@@ -25,17 +25,18 @@ class MoviesListViewModel {
     }
 }
 
-struct MovieViewModel {
+class MovieViewModel {
+    let id: String
     let release_date: String
     let title: String
     let rt_score: String
     let director: String
     let description: String
     let movie: Movie
-    
 
     init(movie: Movie) {
         self.movie = movie
+        id = movie.id
         release_date = movie.releaseDate
         title = movie.title
         rt_score = movie.rtScore

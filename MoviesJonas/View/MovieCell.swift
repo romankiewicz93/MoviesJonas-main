@@ -9,11 +9,12 @@ import Foundation
 import UIKit
 
 class MovieCell: UITableViewCell {
-    
+    var buttonTapAction: (() -> Void)?
+
     struct Layout {
         static let cellInset: CGFloat = 10
     }
-    
+
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
@@ -33,10 +34,24 @@ class MovieCell: UITableViewCell {
         return label
     }()
 
+    lazy var favButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "star"), for: .normal)
+        
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(handleMarkAsFavorite), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        return button
+    }()
+
+    @objc private func handleMarkAsFavorite() {
+        buttonTapAction?()
+    }
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         let horizontalStackView = UIStackView()
-        horizontalStackView.spacing = 3
+        horizontalStackView.spacing = 20
 
         let verticalStackView = UIStackView()
         verticalStackView.axis = .vertical
@@ -45,8 +60,9 @@ class MovieCell: UITableViewCell {
         verticalStackView.addArrangedSubview(subTitleLabel)
         horizontalStackView.addArrangedSubview(verticalStackView)
         horizontalStackView.addArrangedSubview(ratingLabel)
+        horizontalStackView.addArrangedSubview(favButton)
         contentView.addSubview(horizontalStackView)
-        
+
         horizontalStackView.translatesAutoresizingMaskIntoConstraints = false
         horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Layout.cellInset).isActive = true
         horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Layout.cellInset).isActive = true
@@ -69,5 +85,6 @@ class MovieCell: UITableViewCell {
         titleLabel.text = movie.title
         subTitleLabel.text = movie.release_date
         ratingLabel.text = movie.rt_score
+        favButton.tintColor = movie.movie.isFavorite ? .red : .black
     }
 }

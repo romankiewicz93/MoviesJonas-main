@@ -19,6 +19,10 @@ class MovieListViewController: UITableViewController {
         subscribeToViewModel()
         populateMovies()
     }
+    
+    func someMethodIWantToCall(){
+        print("InsideCell")
+    }
 
     // MARK: - Private
 
@@ -50,12 +54,19 @@ extension MovieListViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: movieCellIdentifier, for: indexPath) as? MovieCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: movieCellIdentifier, for: indexPath) as? MovieCell
+        else {
             fatalError("MovieCell is not defined")
         }
+        
         let movie = viewModel.movies.value[indexPath.row]
         cell.configure(movie)
-
+        cell.buttonTapAction = {[weak self] in
+            self?.toggleMovieFavState(movie: movie)
+           // viewModel.movie = movie.movie
+            //movie.movie.isFavorite = true
+            self?.tableView.reloadData()
+        }
         return cell
     }
 
@@ -64,5 +75,10 @@ extension MovieListViewController {
         let movie = viewModel.movies.value[indexPath.row]
         movieDetailViewController.viewModel = movie
         navigationController?.pushViewController(movieDetailViewController, animated: true)
+    }
+    
+    func toggleMovieFavState(movie: MovieViewModel){
+        movie.movie.isFavorite = !movie.movie.isFavorite
+        MovieStoreManager.markNewMovieAsFavorite(movie.movie, isFavorite: movie.movie.isFavorite)
     }
 }
